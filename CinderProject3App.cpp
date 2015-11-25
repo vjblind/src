@@ -89,22 +89,12 @@ void CinderProject3App::load()
 }
 void CinderProject3App::mouseMove(MouseEvent event)
 {
-
-	//mDoc->setStyle
-	
-
 	svg::Node *newNode = mDoc->nodeUnderPoint(event.getPos());
-
-	if (newNode != mCurrentCountry)
-	timeline().apply(&mCurrentCountryAlpha, 3.0f, 0.0f, 0.35f);
 	
-	
-	
-	
+	mCurrentCountry = newNode;
 	// if the current node has no name just set it to NULL
 	if (mCurrentCountry && mCurrentCountry->getId().empty())
 		mCurrentCountry = NULL;
-	
 
 	
 
@@ -140,7 +130,7 @@ void CinderProject3App::draw()
 	//gl::enableAlphaBlending();
 	if (mTex) {
 		gl::color(Color::white());
-	gl::draw(*mDoc);
+	//gl::draw(*mDoc);
 		drawGrid(800.0f, 80.0f);
 
 	}
