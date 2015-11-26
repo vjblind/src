@@ -70,9 +70,6 @@ void CinderProject3App::setup()
 	style = mDoc->calcInheritedStyle();
 	style.setStrokeWidth(30.0f);
 
-	
-	mDoc->setStyle(style);
-
 	mTex = renderSvgToTexture(mDoc, getWindowSize());
 	mFont = gl::TextureFont::create(Font(loadAsset("Dosis-Medium.ttf"), 36));
 	mCurrentCountry = 0;
@@ -84,20 +81,19 @@ void CinderProject3App::setup()
 void CinderProject3App::load()
 {
 
-
-
 }
 void CinderProject3App::mouseMove(MouseEvent event)
 {
 	svg::Node *newNode = mDoc->nodeUnderPoint(event.getPos());
 	
 	mCurrentCountry = newNode;
+	auto style = const_cast<svg::Style*>(&mCurrentCountry->getStyle());
+	style->setStrokeOpacity(1) ;
+	
+	
 	// if the current node has no name just set it to NULL
 	if (mCurrentCountry && mCurrentCountry->getId().empty())
 		mCurrentCountry = NULL;
-
-	
-
 }
 void CinderProject3App::mouseDown( MouseEvent event )
 {
@@ -143,10 +139,13 @@ void CinderProject3App::draw()
 
 		string countryName = mCurrentCountry->getId();
 		// draw the outline
-		timeline().apply(&mCurrentCountryAlpha, 1.0f, 0.0f, 1.0f);
 		gl::color(ColorA(244, 0, 0, 1));
 		gl::drawSolid(mCurrentCountry->getShapeAbsolute());
-		mCurrentCountry->getFill();
+		gl::draw(mCurrentCountry->getShapeAbsolute());
+
+
+	//gl::draw(mCurrentCountry->getShapeAbsolute());
+	
 		gl::drawString("Click to toggle between Cairo & OpenGL", Vec2f(0, 30));
 		gl::color(ColorA(244, 0, 0, 1));
 		mFont->drawString(countryName, Vec2f(0, 30));
