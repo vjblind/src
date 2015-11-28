@@ -38,7 +38,9 @@ class CinderProject3App : public AppBasic {
 	  gl::TextureFontRef	mFont;
 	  bool					mUseCairo;
 	  svg::DocRef				mDoc;
+	  svg::Node                *mCtest;
 	  gl::Texture				mTex;
+	  gl::Texture				mTex9;
 	  svg::Node 			*mCurrentCountry;
 	  svg::Style style ;	  
 	  svg::Paint     pain;
@@ -46,14 +48,7 @@ class CinderProject3App : public AppBasic {
 };
 
 
-gl::Texture renderSvgToTexture(svg::DocRef doc, Vec2i size)
-{
-	cairo::SurfaceImage srf(size.x, size.y, false);
-	cairo::Context ctx(srf);
-	ctx.render(*doc);
-	srf.flush();
-	return gl::Texture(srf.getSurface());
-}
+
 
 void CinderProject3App::prepareSettings(Settings *settings)
 {
@@ -62,17 +57,31 @@ void CinderProject3App::prepareSettings(Settings *settings)
 }
 
 
+gl::Texture renderSvgToTexture(svg::DocRef doc, Vec2i size)
+{
+	cairo::SurfaceImage srf(size.x, size.y, false);
+	cairo::Context ctx(srf);
+	
+	ctx.render(*doc);
+	//auto style1 = const_cast<svg::Style*>(&doc->getStyle());
+	
+	srf.flush();
+	
+	return gl::Texture(srf.getSurface());
+}
+
 
 
 void CinderProject3App::setup()
 {
 	mDoc =  svg::Doc::create(loadAsset("Europe.svg"));
-	style = mDoc->calcInheritedStyle();
-	style.setStrokeWidth(30.0f);
+	
 
 	mTex = renderSvgToTexture(mDoc, getWindowSize());
 	mFont = gl::TextureFont::create(Font(loadAsset("Dosis-Medium.ttf"), 36));
 	mCurrentCountry = 0;
+
+
  
 }
  
@@ -84,13 +93,26 @@ void CinderProject3App::load()
 }
 void CinderProject3App::mouseMove(MouseEvent event)
 {
+	svg::Style style = mDoc->calcInheritedStyle();
+	style.setFillOpacity(0.0f);
+	style.setFill(svg::Paint(ColorA8u(39, 3, 3))
+		);	mDoc->setStyle(style);
+	 
+
+
+	auto stylee = const_cast<svg::Style*>(&mDoc->getStyle());
+	stylee->setOpacity(0.0f);
+	 
+	mDoc.reset();
+
 	svg::Node *newNode = mDoc->nodeUnderPoint(event.getPos());
-	
+	 
+
+
 	mCurrentCountry = newNode;
-	auto style = const_cast<svg::Style*>(&mCurrentCountry->getStyle());
-	style->setStrokeOpacity(1) ;
+
 	
-	
+
 	// if the current node has no name just set it to NULL
 	if (mCurrentCountry && mCurrentCountry->getId().empty())
 		mCurrentCountry = NULL;
@@ -125,7 +147,8 @@ void CinderProject3App::draw()
 	//gl::enableDepthWrite();
 	//gl::enableAlphaBlending();
 	if (mTex) {
-		gl::color(Color::white());
+	//l::color(Color::white());
+		
 	//gl::draw(*mDoc);
 		drawGrid(800.0f, 80.0f);
 
@@ -139,9 +162,9 @@ void CinderProject3App::draw()
 
 		string countryName = mCurrentCountry->getId();
 		// draw the outline
-		gl::color(ColorA(244, 0, 0, 1));
-		gl::drawSolid(mCurrentCountry->getShapeAbsolute());
-		gl::draw(mCurrentCountry->getShapeAbsolute());
+		//gl::color(ColorA(244, 0, 0, 1));
+	gl::drawSolid(mCurrentCountry->getShapeAbsolute());
+	gl::draw(mCurrentCountry->getShapeAbsolute());
 
 
 	//gl::draw(mCurrentCountry->getShapeAbsolute());
